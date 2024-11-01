@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Produtos Awin</title>
+    <title>Promoções Awin</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -27,17 +27,17 @@
             padding: 20px;
         }
 
-        .produtos {
+        .promocoes {
             margin: 20px 0;
         }
 
-        .produto-lista {
+        .promocao-lista {
             display: flex;
             flex-wrap: wrap;
             gap: 20px;
         }
 
-        .produto {
+        .promocao {
             background-color: white;
             border-radius: 5px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -45,9 +45,9 @@
             width: 200px;
         }
 
-        .produto img {
-            max-width: 100%;
-            border-radius: 5px;
+        .promocao h3 {
+            margin: 0;
+            font-size: 1.2em;
         }
 
         footer {
@@ -61,29 +61,45 @@
 <body>
     <header>
         <nav>
-            <h1>Loja Awin</h1>
+            <h1>Promoções Awin</h1>
         </nav>
     </header>
     <main>
-        <section id="produtos" class="produtos">
-            <h2>Produtos Disponíveis</h2>
-            <div id="produto-lista" class="produto-lista"></div>
+        <section id="promocoes" class="promocoes">
+            <h2>Promoções Disponíveis</h2>
+            <div id="promocao-lista" class="promocao-lista"></div>
         </section>
     </main>
     <footer>
-        <p>&copy; 2024 Loja Awin. Todos os direitos reservados.</p>
+        <p>&copy; 2024 Promoções Awin. Todos os direitos reservados.</p>
     </footer>
     <script>
-        const apiUrl = 'https://api.awin.com/publishers/1759561/products';
+        const apiUrl = 'https://api.awin.com/publisher/1759561/promotions';
         const apiKey = '0ff84c9e-f757-4868-be49-4209f2581c50';
 
-        async function fetchProdutos() {
+        async function fetchPromocoes() {
             try {
                 const response = await fetch(apiUrl, {
-                    method: 'GET',
+                    method: 'POST',
                     headers: {
-                        'Authorization': `Bearer ${apiKey}`
-                    }
+                        'Authorization': `Bearer ${apiKey}`,
+                        'Content-Type': 'application/json',
+                        'accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        filters: {
+                            advertiserIds: [], // Adicione os IDs dos anunciantes se necessário
+                            exclusiveOnly: true, // Defina como true ou false
+                            membership: "all", // Pode ser "joined", "notJoined" ou "all"
+                            regionCodes: [], // Adicione códigos de região se necessário
+                            status: "active", // "active", "expiringSoon", "upcoming"
+                            type: "all" // "promotion", "voucher" ou "all"
+                        },
+                        pagination: {
+                            page: 1, // Número da página
+                            pageSize: 10 // Número de promoções por página
+                        }
+                    })
                 });
 
                 // Verifica se a resposta foi bem-sucedida
@@ -92,37 +108,37 @@
                 }
 
                 const data = await response.json();
-                console.log(data);  // Log da resposta para verificar a estrutura dos dados
-                displayProdutos(data.products);  // Atualize se o nome da propriedade for diferente
+                console.log(data); // Log da resposta para verificar a estrutura dos dados
+                displayPromocoes(data.offers); // Ajuste se o nome da propriedade for diferente
             } catch (error) {
-                console.error('Erro ao buscar produtos:', error);
-                document.getElementById('produto-lista').innerHTML = '<p>Erro ao carregar produtos.</p>';
+                console.error('Erro ao buscar promoções:', error);
+                document.getElementById('promocao-lista').innerHTML = '<p>Erro ao carregar promoções.</p>';
             }
         }
 
-        function displayProdutos(produtos) {
-            const lista = document.getElementById('produto-lista');
+        function displayPromocoes(promocoes) {
+            const lista = document.getElementById('promocao-lista');
             lista.innerHTML = '';
 
-            if (!produtos || produtos.length === 0) {
-                lista.innerHTML = '<p>Nenhum produto encontrado.</p>';
+            if (!promocoes || promocoes.length === 0) {
+                lista.innerHTML = '<p>Nenhuma promoção encontrada.</p>';
                 return;
             }
 
-            produtos.forEach(produto => {
-                const produtoDiv = document.createElement('div');
-                produtoDiv.className = 'produto';
-                produtoDiv.innerHTML = `
-                    <img src="${produto.imageUrl}" alt="${produto.name}">
-                    <h3>${produto.name}</h3>
-                    <p>Preço: R$${produto.price}</p>
-                    <a href="${produto.link}" target="_blank">Ver Produto</a>
+            promocoes.forEach(promocao => {
+                const promocaoDiv = document.createElement('div');
+                promocaoDiv.className = 'promocao';
+                promocaoDiv.innerHTML = `
+                    <h3>${promocao.title}</h3>
+                    <p>${promocao.description}</p>
+                    <p><strong>Termos:</strong> ${promocao.terms}</p>
+                    <a href="${promocao.url}" target="_blank">Ver Promoção</a>
                 `;
-                lista.appendChild(produtoDiv);
+                lista.appendChild(promocaoDiv);
             });
         }
 
-        document.addEventListener('DOMContentLoaded', fetchProdutos);
+        document.addEventListener('DOMContentLoaded', fetchPromocoes);
     </script>
 </body>
 </html>
