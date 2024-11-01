@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ShopMercado - Produtos da Shopee</title>
+    <title>ShopMercado - Ofertas da Shopee</title>
     <style>
         /* Estilo global */
         body {
@@ -125,46 +125,68 @@
     </footer>
 
     <script>
-        // Função para buscar os produtos da Shopee
-        async function fetchShopeeProducts() {
-            const storeId = '126592'; // ID da loja (sandbox)
-            const apiKey = '49fe383b1599411f'; // Chave da API (sandbox)
-            const baseUrl = 'https://seller.test-stable.shopee.com.br/api/v2'; // URL da sandbox
-            const endpoint = '/product/get_list?pagination_offset=0&pagination_entries_per_page=10'; // Endpoint para listar produtos
+        let products = []; // Armazena os produtos
+
+        // Função para converter CSV em um array de objetos
+        function csvToArray(text) {
+            const rows = text.split('\n');
+            const headers = rows[0].split(',');
+
+            return rows.slice(1).map(row => {
+                const values = row.split(',');
+                return headers.reduce((obj, header, index) => {
+                    obj[header.trim()] = values[index] ? values[index].trim() : ''; // Lidar com campos vazios
+                    return obj;
+                }, {});
+            });
+        }
+
+        // Função para buscar ofertas da Shopee
+        async function fetchOffersFromShopee() {
+            const url = 'https://affiliate.shopee.com.br/api/v1/datafeed/download?id=YWJjZGVmZ2hpamtsbW5vcPNcbnfdFhhQkoz1FtnUm6DtED25ejObtofpYLqHBC0h';
 
             try {
-                const response = await fetch(`${baseUrl}${endpoint}`, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${apiKey}`
-                    }
-                });
-
+                const response = await fetch(url);
                 if (!response.ok) {
                     throw new Error(`Erro: ${response.status}`);
                 }
+                
+                const text = await response.text(); // Pega o texto CSV
+                products = csvToArray(text); // Armazena os produtos
 
-                const data = await response.json();
-                console.log(data); // Para depuração
-
-                // Exibir os produtos no corpo da página
-                const productsDiv = document.getElementById('products');
-                productsDiv.innerHTML = data.products.map(product => 
-                    `<div class="product-card">
-                        <img src="${product.image}" alt="${product.name}">
-                        <h2>${product.name}</h2>
-                        <p>Preço: R$${(product.price / 100000).toFixed(2)}</p>
-                    </div>`
-                ).join('');
+                // Exibir todos os produtos inicialmente
+                displayProducts(products);
 
             } catch (error) {
-                console.error('Erro ao buscar produtos da Shopee:', error);
+                console.error('Erro ao buscar ofertas da Shopee:', error);
             }
         }
 
+        // Função para exibir produtos na página
+        function displayProducts(productsToDisplay) {
+            const productsDiv = document.getElementById('products');
+            productsDiv.innerHTML = productsToDisplay.map(product => 
+                `<div class="product-card">
+                    <img src="${product['image_url']}" alt="${product['item_name']}">
+                    <h2>${product['item_name']}</h2>
+                    <p>Preço: R$${(parseFloat(product['price']) / 100).toFixed(2)}</p>
+                    <a href="${product['link']}" target="_blank">Comprar</a>
+                </div>`
+            ).join('');
+        }
+
+        // Adicionando funcionalidade de busca
+        document.querySelector('.navbar button').addEventListener('click', () => {
+            const searchTerm = document.querySelector('.navbar input[type="text"]').value.toLowerCase();
+            const filteredProducts = products.filter(product => 
+                product['item_name'].toLowerCase().includes(searchTerm)
+            );
+
+            displayProducts(filteredProducts);
+        });
+
         // Chamar a função ao carregar a página
-        fetchShopeeProducts();
+        fetchOffersFromShopee();
     </script>
 </body>
 </html>
