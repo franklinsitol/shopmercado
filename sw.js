@@ -8,5 +8,5 @@ self.addEventListener('activate', event => {
 });
 
 self.addEventListener('fetch', event => {
-  // Pode adicionar lógica de cache aqui
+  // Adicione lógica de cache, se necessário
 });
