@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>PWA Exemplo</title>
   <link rel="manifest" href="manifest.json">
-  <link rel="icon" href="icon-192.png">
   <meta name="theme-color" content="#000000" />
   <style>
     body {
@@ -26,7 +25,7 @@
   <button id="installBtn" style="display: none;">Instalar App</button>
 
   <script>
-    // Registrar o Service Worker
+    // Verifica se o navegador suporta Service Worker
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('sw.js')
         .then(() => console.log('SW registrado com sucesso'))
@@ -38,13 +37,13 @@
     const installBtn = document.getElementById('installBtn');
 
     window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
+      e.preventDefault(); // Previne o pop-up padrão do navegador
       deferredPrompt = e;
-      installBtn.style.display = 'inline-block';
+      installBtn.style.display = 'inline-block'; // Exibe o botão de instalação
 
       installBtn.addEventListener('click', () => {
-        installBtn.style.display = 'none';
-        deferredPrompt.prompt();
+        installBtn.style.display = 'none'; // Esconde o botão após o clique
+        deferredPrompt.prompt(); // Exibe o pop-up de instalação
         deferredPrompt.userChoice.then((choiceResult) => {
           if (choiceResult.outcome === 'accepted') {
             console.log('Usuário aceitou instalar');
@@ -54,6 +53,11 @@
           deferredPrompt = null;
         });
       });
+    });
+
+    // Se o PWA já estiver instalado, não precisa mais do botão
+    window.addEventListener('appinstalled', (evt) => {
+      console.log('PWA instalado!');
     });
   </script>
 </body>
