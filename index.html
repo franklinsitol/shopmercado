@@ -1,64 +1,1016 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>PWA Exemplo</title>
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#000000" />
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      padding: 2rem;
-    }
-    button {
-      padding: 1rem 2rem;
-      font-size: 1.2rem;
-      margin-top: 20px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MELIPEE - Compare preços da Shopee e Mercado Livre</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --shopee-orange: #FF6A00;
+            --meli-yellow: #FFE600;
+            --dark-gray: #333333;
+            --light-gray: #f5f5f5;
+            --white: #ffffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            overflow-x: hidden;
+            background: #f8f9fa;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--shopee-orange) 0%, var(--meli-yellow) 100%);
+            padding: 20px 0;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .logo {
+            font-size: 3.5rem;
+            font-weight: 800;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            margin-bottom: 10px;
+            letter-spacing: -1px;
+        }
+
+        .tagline {
+            font-size: 1.2rem;
+            color: var(--dark-gray);
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .search-container {
+            width: 90%;
+            max-width: 700px;
+            margin: 0 auto 20px;
+            position: relative;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 18px 25px;
+            border-radius: 50px;
+            border: none;
+            font-size: 1.1rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .search-box:focus {
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .search-btn {
+            position: absolute;
+            right: 10px;
+            top: 10px;
+            background: var(--shopee-orange);
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 10px rgba(255, 106, 0, 0.3);
+        }
+
+        .search-btn:hover {
+            transform: scale(1.05);
+            background: #e55a00;
+        }
+
+        .container {
+            display: flex;
+            min-height: calc(100vh - 200px);
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .platform-section {
+            flex: 1;
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            border-radius: 15px;
+            margin: 0 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            background: white;
+        }
+
+        .shopee-section {
+            border-top: 5px solid var(--shopee-orange);
+        }
+
+        .meli-section {
+            border-top: 5px solid var(--meli-yellow);
+        }
+
+        .platform-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .shopee-title {
+            color: var(--shopee-orange);
+        }
+
+        .meli-title {
+            color: var(--meli-yellow);
+            text-shadow: 1px 1px 1px rgba(0,0,0,0.1);
+        }
+
+        .platform-logo {
+            width: 30px;
+            height: 30px;
+            margin-right: 10px;
+            border-radius: 5px;
+        }
+
+        .filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 25px;
+            justify-content: center;
+        }
+
+        .filter-btn {
+            padding: 10px 18px;
+            border-radius: 20px;
+            border: none;
+            background: var(--light-gray);
+            color: var(--dark-gray);
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .shopee-section .filter-btn.active {
+            background: var(--shopee-orange);
+            color: white;
+        }
+
+        .meli-section .filter-btn.active {
+            background: var(--meli-yellow);
+            color: var(--dark-gray);
+        }
+
+        .filter-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+        }
+
+        .products-container {
+            width: 100%;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            transition: all 0.3s ease;
+            border: 1px solid #eee;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .product-card:hover {
+            transform: translateY(-7px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
+        }
+
+        .product-image-container {
+            position: relative;
+            width: 100%;
+            height: 200px;
+            overflow: hidden;
+        }
+
+        .product-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .product-card:hover .product-image {
+            transform: scale(1.05);
+        }
+
+        .product-discount {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #ff4444;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .product-info {
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .product-title {
+            font-size: 1rem;
+            margin-bottom: 12px;
+            color: var(--dark-gray);
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            line-height: 1.4;
+            flex-grow: 1;
+        }
+
+        .product-price-container {
+            margin-bottom: 10px;
+        }
+
+        .product-price {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--shopee-orange);
+            margin-bottom: 5px;
+        }
+
+        .meli-section .product-price {
+            color: var(--dark-gray);
+        }
+
+        .product-original-price {
+            text-decoration: line-through;
+            color: #999;
+            font-size: 0.9rem;
+        }
+
+        .product-seller {
+            font-size: 0.8rem;
+            color: #666;
+            margin-bottom: 12px;
+        }
+
+        .product-rating {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .stars {
+            color: #FFC107;
+            margin-right: 5px;
+            font-size: 1rem;
+        }
+
+        .rating-value {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .buy-btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background: var(--shopee-orange);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            text-decoration: none;
+            font-size: 1rem;
+            margin-top: auto;
+        }
+
+        .meli-section .buy-btn {
+            background: var(--meli-yellow);
+            color: var(--dark-gray);
+        }
+
+        .buy-btn:hover {
+            background: #e55a00;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(229, 90, 0, 0.3);
+        }
+
+        .meli-section .buy-btn:hover {
+            background: #e6cf00;
+            box-shadow: 0 5px 10px rgba(230, 207, 0, 0.3);
+        }
+
+        .coupons-section {
+            width: 100%;
+            margin-top: 30px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 12px;
+            padding: 20px;
+            border-left: 4px solid var(--shopee-orange);
+        }
+
+        .meli-section .coupons-section {
+            border-left: 4px solid var(--meli-yellow);
+        }
+
+        .coupons-title {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .shopee-section .coupons-title {
+            color: var(--shopee-orange);
+        }
+
+        .meli-section .coupons-title {
+            color: var(--dark-gray);
+        }
+
+        .coupons-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .coupon {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            border: 1px dashed #ddd;
+        }
+
+        .coupon:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .coupon-info {
+            flex-grow: 1;
+        }
+
+        .coupon-desc {
+            font-size: 0.9rem;
+            color: var(--dark-gray);
+            margin-bottom: 5px;
+        }
+
+        .coupon-code {
+            font-weight: 700;
+            color: var(--shopee-orange);
+            font-size: 1.1rem;
+        }
+
+        .meli-section .coupon-code {
+            color: var(--dark-gray);
+        }
+
+        .copy-btn {
+            background: var(--shopee-orange);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .meli-section .copy-btn {
+            background: var(--meli-yellow);
+            color: var(--dark-gray);
+        }
+
+        .copy-btn:hover {
+            background: #e55a00;
+        }
+
+        .meli-section .copy-btn:hover {
+            background: #e6cf00;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px 20px;
+            grid-column: 1 / -1;
+        }
+
+        .loading-spinner {
+            border: 4px solid rgba(255, 106, 0, 0.2);
+            border-radius: 50%;
+            border-top: 4px solid var(--shopee-orange);
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        .meli-section .loading-spinner {
+            border: 4px solid rgba(255, 230, 0, 0.2);
+            border-top: 4px solid var(--meli-yellow);
+        }
+
+        .loading p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .error-message {
+            color: #d32f2f;
+            text-align: center;
+            padding: 30px 20px;
+            background: #ffebee;
+            border-radius: 10px;
+            margin: 10px;
+            grid-column: 1 / -1;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+            grid-column: 1 / -1;
+        }
+
+        .empty-state img {
+            width: 120px;
+            margin-bottom: 20px;
+            opacity: 0.6;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 1100px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .platform-section {
+                margin: 10px 0;
+            }
+            
+            .logo {
+                font-size: 2.8rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .products-container {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+            
+            .logo {
+                font-size: 2.2rem;
+            }
+            
+            .search-box {
+                padding: 15px 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .products-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .coupons-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .logo {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
 </head>
 <body>
-  <h1>Olá, sou uma PWA instalada! 🚀</h1>
-  <p>Instale-me na sua tela inicial!</p>
-  <button id="installBtn" style="display: none;">Instalar App</button>
+    <div class="header">
+        <div class="logo">MELIPEE</div>
+        <div class="tagline">Compare preços da Shopee e Mercado Livre em um só lugar</div>
+        
+        <div class="search-container">
+            <input type="text" class="search-box" placeholder="O que você está procurando? Ex: smartphone, fone de ouvido..." id="search-input">
+            <button class="search-btn" id="search-btn">Buscar</button>
+        </div>
+    </div>
 
-  <script>
-    // Verifica se o navegador suporta Service Worker
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('sw.js')
-        .then(() => console.log('SW registrado com sucesso'))
-        .catch(err => console.error('Erro ao registrar SW', err));
-    }
+    <div class="container">
+        <!-- Seção Shopee -->
+        <div class="platform-section shopee-section">
+            <div class="platform-title shopee-title">
+                <div class="platform-logo" style="background: var(--shopee-orange);"></div>
+                Shopee
+            </div>
+            
+            <div class="filters">
+                <button class="filter-btn active" data-filter="price">Menor Preço</button>
+                <button class="filter-btn" data-filter="rating">Melhor Avaliação</button>
+                <button class="filter-btn" data-filter="sales">Mais Vendidos</button>
+                <button class="filter-btn" data-filter="discount">Maior Desconto</button>
+            </div>
+            
+            <div class="products-container" id="shopee-products">
+                <div class="loading" id="shopee-loading">
+                    <div class="loading-spinner"></div>
+                    <p>Buscando produtos na Shopee...</p>
+                </div>
+            </div>
+            
+            <div class="coupons-section">
+                <div class="coupons-title">Cupons Shopee</div>
+                <div class="coupons-container">
+                    <div class="coupon">
+                        <div class="coupon-info">
+                            <div class="coupon-desc">10% OFF em Eletrônicos</div>
+                            <div class="coupon-code">ELETRO10</div>
+                        </div>
+                        <button class="copy-btn">Copiar</button>
+                    </div>
+                    <div class="coupon">
+                        <div class="coupon-info">
+                            <div class="coupon-desc">R$ 20 OFF em Compras Acima de R$ 100</div>
+                            <div class="coupon-code">ECONOMIZE20</div>
+                        </div>
+                        <button class="copy-btn">Copiar</button>
+                    </div>
+                    <div class="coupon">
+                        <div class="coupon-info">
+                            <div class="coupon-desc">Frete Grátis em Produtos Selecionados</div>
+                            <div class="coupon-code">FRETEGRATIS</div>
+                        </div>
+                        <button class="copy-btn">Copiar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Seção Mercado Livre -->
+        <div class="platform-section meli-section">
+            <div class="platform-title meli-title">
+                <div class="platform-logo" style="background: var(--meli-yellow);"></div>
+                Mercado Livre
+            </div>
+            
+            <div class="filters">
+                <button class="filter-btn active" data-filter="price">Menor Preço</button>
+                <button class="filter-btn" data-filter="rating">Melhor Avaliação</button>
+                <button class="filter-btn" data-filter="sales">Mais Vendidos</button>
+                <button class="filter-btn" data-filter="free-shipping">Frete Grátis</button>
+            </div>
+            
+            <div class="products-container" id="meli-products">
+                <div class="loading" id="meli-loading">
+                    <div class="loading-spinner"></div>
+                    <p>Buscando produtos no Mercado Livre...</p>
+                </div>
+            </div>
+            
+            <div class="coupons-section">
+                <div class="coupons-title">Cupons Mercado Livre</div>
+                <div class="coupons-container">
+                    <div class="coupon">
+                        <div class="coupon-info">
+                            <div class="coupon-desc">15% OFF com Mercado Pago</div>
+                            <div class="coupon-code">MP15OFF</div>
+                        </div>
+                        <button class="copy-btn">Copiar</button>
+                    </div>
+                    <div class="coupon">
+                        <div class="coupon-info">
+                            <div class="coupon-desc">Frete Grátis em Produtos Selecionados</div>
+                            <div class="coupon-code">FRETEGRATIS</div>
+                        </div>
+                        <button class="copy-btn">Copiar</button>
+                    </div>
+                    <div class="coupon">
+                        <div class="coupon-info">
+                            <div class="coupon-desc">10% OFF na Primeira Compra</div>
+                            <div class="coupon-code">PRIMEIRACOMPRA</div>
+                        </div>
+                        <button class="copy-btn">Copiar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    // Gerenciar prompt de instalação
-    let deferredPrompt;
-    const installBtn = document.getElementById('installBtn');
+    <script>
+        // Configurações da API
+        const SHOPEE_API_URL = 'https://affiliate.shopee.com.br/api/v1/datafeed/download?id=YWJjZGVmZ2hpamtsbW5vcFMjz35zY_7hscVJ_4QLIFiIR3DQ9hsrLcX6rgIVVFkb';
+        const SHOPEE_AFFILIATE_TAG = '?af=18368710427'; // Seu ID de afiliado
 
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault(); // Previne o pop-up padrão do navegador
-      deferredPrompt = e;
-      installBtn.style.display = 'inline-block'; // Exibe o botão de instalação
+        // URL alternativa do Google Sheets (se necessário)
+        const GOOGLE_SHEETS_URL = ''; // Deixe em branco por enquanto
 
-      installBtn.addEventListener('click', () => {
-        installBtn.style.display = 'none'; // Esconde o botão após o clique
-        deferredPrompt.prompt(); // Exibe o pop-up de instalação
-        deferredPrompt.userChoice.then((choiceResult) => {
-          if (choiceResult.outcome === 'accepted') {
-            console.log('Usuário aceitou instalar');
-          } else {
-            console.log('Usuário recusou instalação');
-          }
-          deferredPrompt = null;
+        // Dados de exemplo para o Mercado Livre (serão substituídos pela API real posteriormente)
+        const meliProducts = [
+            {
+                id: 1,
+                title: "Smartphone Samsung Galaxy A14 128GB 4GB RAM Tela 6.6'' Dual Chip",
+                price: "R$ 849,00",
+                originalPrice: "R$ 1.099,00",
+                discount: "23% OFF",
+                image: "https://via.placeholder.com/300x200/FFE600/333333?text=Samsung+A14",
+                seller: "EletroMania",
+                rating: 4.6,
+                reviews: 980,
+                link: "#"
+            },
+            {
+                id: 2,
+                title: "Fone de Ouvido Bluetooth JBL Tune 510BT Preto - Resistente a Suor",
+                price: "R$ 219,00",
+                originalPrice: "R$ 299,00",
+                discount: "27% OFF",
+                image: "https://via.placeholder.com/300x200/FFE600/333333?text=JBL+Tune+510BT",
+                seller: "AudioPremium",
+                rating: 4.4,
+                reviews: 650,
+                link: "#"
+            },
+            {
+                id: 3,
+                title: "Smartwatch Xiaomi Mi Band 7 - Monitor de Frequência Cardíaca e Oxigênio",
+                price: "R$ 269,00",
+                originalPrice: "R$ 349,00",
+                discount: "23% OFF",
+                image: "https://via.placeholder.com/300x200/FFE600/333333?text=Xiaomi+Mi+Band+7",
+                seller: "TechGadgets",
+                rating: 4.7,
+                reviews: 1750,
+                link: "#"
+            },
+            {
+                id: 4,
+                title: "Tablet Samsung Galaxy Tab A8 10.5'' 64GB Wi-Fi 4GB RAM Câmera Traseira 8MP",
+                price: "R$ 1.299,00",
+                originalPrice: "R$ 1.599,00",
+                discount: "19% OFF",
+                image: "https://via.placeholder.com/300x200/FFE600/333333?text=Samsung+Tab+A8",
+                seller: "TechStore",
+                rating: 4.5,
+                reviews: 320,
+                link: "#"
+            },
+            {
+                id: 5,
+                title: "Console Nintendo Switch OLED 64GB com Joy-Con - Edição Neon",
+                price: "R$ 2.199,00",
+                originalPrice: "R$ 2.599,00",
+                discount: "15% OFF",
+                image: "https://via.placeholder.com/300x200/FFE600/333333?text=Nintendo+Switch",
+                seller: "GameStore",
+                rating: 4.8,
+                reviews: 890,
+                link: "#"
+            }
+        ];
+
+        // Função para buscar produtos da Shopee via API
+        async function fetchShopeeProducts(query = '') {
+            try {
+                // Mostrar loading
+                document.getElementById('shopee-loading').style.display = 'block';
+                
+                // Tentar acessar a API da Shopee diretamente
+                let csvData;
+                
+                try {
+                    // Primeira tentativa: acessar a API diretamente
+                    const response = await fetch(SHOPEE_API_URL, {
+                        method: 'GET',
+                        mode: 'cors',
+                        headers: {
+                            'Accept': 'text/csv',
+                        }
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error('Erro na resposta da API');
+                    }
+                    
+                    csvData = await response.text();
+                } catch (directError) {
+                    console.warn('Erro ao acessar API diretamente, tentando Google Sheets:', directError);
+                    
+                    // Segunda tentativa: usar Google Sheets se disponível
+                    if (GOOGLE_SHEETS_URL) {
+                        const sheetsResponse = await fetch(GOOGLE_SHEETS_URL);
+                        csvData = await sheetsResponse.text();
+                    } else {
+                        // Terceira tentativa: usar dados de exemplo
+                        throw new Error('Google Sheets não configurado');
+                    }
+                }
+                
+                const products = parseShopeeCSV(csvData, query);
+                
+                // Renderizar produtos
+                renderProducts(products, 'shopee-products');
+                
+                // Esconder loading
+                document.getElementById('shopee-loading').style.display = 'none';
+                
+                return products;
+            } catch (error) {
+                console.error('Erro ao buscar produtos da Shopee:', error);
+                document.getElementById('shopee-loading').style.display = 'none';
+                
+                // Mostrar mensagem de erro
+                const container = document.getElementById('shopee-products');
+                container.innerHTML = `
+                    <div class="error-message">
+                        <p>Não foi possível carregar os produtos da Shopee no momento.</p>
+                        <p>Verifique sua conexão ou tente novamente mais tarde.</p>
+                        <p><small>Detalhes: ${error.message}</small></p>
+                    </div>
+                `;
+                
+                // Carregar dados de exemplo em caso de erro
+                const sampleProducts = getSampleShopeeProducts(query);
+                renderProducts(sampleProducts, 'shopee-products');
+            }
+        }
+
+        // Função para parsear CSV da Shopee
+        function parseShopeeCSV(csvData, query = '') {
+            const lines = csvData.split('\n');
+            const headers = lines[0].split(',');
+            
+            const products = [];
+            
+            for (let i = 1; i < lines.length; i++) {
+                if (!lines[i].trim()) continue;
+                
+                const values = lines[i].split(',');
+                const product = {};
+                
+                headers.forEach((header, index) => {
+                    product[header.trim()] = values[index] ? values[index].trim() : '';
+                });
+                
+                // Filtrar por query se fornecida
+                if (query && !product.product_name.toLowerCase().includes(query.toLowerCase())) {
+                    continue;
+                }
+                
+                // Formatar produto para o formato esperado pelo site
+                const formattedProduct = {
+                    id: product.product_id,
+                    title: product.product_name,
+                    price: `R$ ${parseFloat(product.product_price).toFixed(2).replace('.', ',')}`,
+                    originalPrice: product.discount ? `R$ ${(parseFloat(product.product_price) / (1 - parseFloat(product.discount)/100)).toFixed(2).replace('.', ',')}` : '',
+                    discount: product.discount ? `${product.discount}% OFF` : '',
+                    image: product.image_url,
+                    seller: 'Shopee',
+                    rating: parseFloat(product.rating) || 4.5,
+                    reviews: parseInt(product.historical_sold) || 100,
+                    link: product.product_url + SHOPEE_AFFILIATE_TAG
+                };
+                
+                products.push(formattedProduct);
+            }
+            
+            return products.slice(0, 10); // Limitar a 10 produtos para demonstração
+        }
+
+        // Função para obter produtos de exemplo da Shopee
+        function getSampleShopeeProducts(query = '') {
+            const sampleProducts = [
+                {
+                    id: 1,
+                    title: "Smartphone Samsung Galaxy A14 128GB 4GB RAM Tela 6.6'' Dual Chip",
+                    price: "R$ 899,00",
+                    originalPrice: "R$ 1.099,00",
+                    discount: "18% OFF",
+                    image: "https://via.placeholder.com/300x200/FF6A00/FFFFFF?text=Smartphone+Shopee",
+                    seller: "TechStore",
+                    rating: 4.7,
+                    reviews: 1250,
+                    link: "https://shope.ee/7UYK1q3V4q" + SHOPEE_AFFILIATE_TAG
+                },
+                {
+                    id: 2,
+                    title: "Fone de Ouvido Bluetooth JBL Tune 510BT Preto - Resistente a Suor",
+                    price: "R$ 199,00",
+                    originalPrice: "R$ 299,00",
+                    discount: "33% OFF",
+                    image: "https://via.placeholder.com/300x200/FF6A00/FFFFFF?text=Fone+Shopee",
+                    seller: "AudioWorld",
+                    rating: 4.5,
+                    reviews: 890,
+                    link: "https://shope.ee/6UxYQjJk9v" + SHOPEE_AFFILIATE_TAG
+                },
+                {
+                    id: 3,
+                    title: "Smartwatch Xiaomi Mi Band 7 - Monitor de Frequência Cardíaca e Oxigênio",
+                    price: "R$ 249,00",
+                    originalPrice: "R$ 349,00",
+                    discount: "29% OFF",
+                    image: "https://via.placeholder.com/300x200/FF6A00/FFFFFF?text=Smartwatch+Shopee",
+                    seller: "GadgetStore",
+                    rating: 4.8,
+                    reviews: 2100,
+                    link: "https://shope.ee/1q4JdKk9wX" + SHOPEE_AFFILIATE_TAG
+                },
+                {
+                    id: 4,
+                    title: "Tablet Samsung Galaxy Tab A8 10.5'' 64GB Wi-Fi 4GB RAM Câmera Traseira 8MP",
+                    price: "R$ 1.299,00",
+                    originalPrice: "R$ 1.529,00",
+                    discount: "15% OFF",
+                    image: "https://via.placeholder.com/300x200/FF6A00/FFFFFF?text=Tablet+Shopee",
+                    seller: "TechStore",
+                    rating: 4.6,
+                    reviews: 450,
+                    link: "https://shope.ee/3futV0k9yZ" + SHOPEE_AFFILIATE_TAG
+                },
+                {
+                    id: 5,
+                    title: "Console Nintendo Switch OLED 64GB com Joy-Con - Edição Neon",
+                    price: "R$ 2.199,00",
+                    originalPrice: "R$ 2.599,00",
+                    discount: "15% OFF",
+                    image: "https://via.placeholder.com/300x200/FF6A00/FFFFFF?text=Nintendo+Shopee",
+                    seller: "GameStore",
+                    rating: 4.8,
+                    reviews: 670,
+                    link: "https://shope.ee/7UYK2r4W6a" + SHOPEE_AFFILIATE_TAG
+                }
+            ];
+            
+            // Filtrar por query se fornecida
+            if (query) {
+                return sampleProducts.filter(product => 
+                    product.title.toLowerCase().includes(query.toLowerCase())
+                );
+            }
+            
+            return sampleProducts;
+        }
+
+        // Função para renderizar produtos
+        function renderProducts(products, containerId) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            
+            if (products.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCA2NCA2NCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTI0IDQ0QzMwLjYyNyA0NCAzNiAzOC42MjcgMzYgMzJDMzYgMjUuMzcyOCAzMC42MjcgMjAgMjQgMjBDMTcuMzcyOCAyMCAxMiAyNS4zNzI4IDEyIDMyQzEyIDM4LjYyNyAxNy4zNzI4IDQ0IDI0IDQ0WiIgZmlsbD0iI0RERERERCIvPgo8cGF0aCBkPSJNOCA1NkM4IDU2IDQgNDggNCAzMkM0IDE2IDIwIDggMzIgOEM0NCA4IDYwIDE2IDYwIDMyQzYwIDQ4IDU2IDU2IDU2IDU2IiBzdHJva2U9IiNEREREREQiIHN0cm9rZS13aWR0aD0iNCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+Cjwvc3ZnPgo=" alt="Nenhum produto encontrado">
+                        <h3>Nenhum produto encontrado</h3>
+                        <p>Tente usar termos de busca diferentes</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            products.forEach(product => {
+                const productCard = document.createElement('div');
+                productCard.className = 'product-card';
+                
+                // Gerar estrelas baseadas na avaliação
+                const stars = '★'.repeat(Math.floor(product.rating)) + '☆'.repeat(5 - Math.floor(product.rating));
+                
+                productCard.innerHTML = `
+                    <div class="product-image-container">
+                        <img src="${product.image}" alt="${product.title}" class="product-image">
+                        ${product.discount ? `<div class="product-discount">${product.discount}</div>` : ''}
+                    </div>
+                    <div class="product-info">
+                        <h3 class="product-title">${product.title}</h3>
+                        <div class="product-price-container">
+                            <div class="product-price">${product.price}</div>
+                            ${product.originalPrice ? `<div class="product-original-price">${product.originalPrice}</div>` : ''}
+                        </div>
+                        <div class="product-seller">Vendido por: ${product.seller}</div>
+                        <div class="product-rating">
+                            <span class="stars">${stars}</span>
+                            <span class="rating-value">${product.rating} (${product.reviews} avaliações)</span>
+                        </div>
+                        <a href="${product.link}" class="buy-btn" target="_blank">Comprar Agora</a>
+                    </div>
+                `;
+                
+                container.appendChild(productCard);
+            });
+        }
+
+        // Função para buscar produtos do Mercado Livre (simulação)
+        function fetchMeliProducts(query = '') {
+            // Mostrar loading
+            document.getElementById('meli-loading').style.display = 'block';
+            
+            // Simular delay de busca
+            setTimeout(() => {
+                // Filtrar produtos baseado na query (simulação)
+                const filteredMeli = query ? 
+                    meliProducts.filter(product => 
+                        product.title.toLowerCase().includes(query.toLowerCase())
+                    ) : meliProducts;
+                
+                // Renderizar produtos
+                renderProducts(filteredMeli, 'meli-products');
+                
+                // Esconder loading
+                document.getElementById('meli-loading').style.display = 'none';
+            }, 1500);
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            // Carregar produtos iniciais
+            fetchShopeeProducts();
+            fetchMeliProducts();
+            
+            // Buscar produtos ao clicar no botão
+            document.getElementById('search-btn').addEventListener('click', () => {
+                const query = document.getElementById('search-input').value;
+                fetchShopeeProducts(query);
+                fetchMeliProducts(query);
+            });
+            
+            // Buscar produtos ao pressionar Enter
+            document.getElementById('search-input').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    const query = document.getElementById('search-input').value;
+                    fetchShopeeProducts(query);
+                    fetchMeliProducts(query);
+                }
+            });
+            
+            // Filtros
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    // Remover classe active de todos os botões do mesmo container
+                    this.parentElement.querySelectorAll('.filter-btn').forEach(b => {
+                        b.classList.remove('active');
+                    });
+                    
+                    // Adicionar classe active ao botão clicado
+                    this.classList.add('active');
+                    
+                    // Aqui você implementaria a lógica de filtragem real
+                    const filter = this.getAttribute('data-filter');
+                    console.log(`Filtrando por: ${filter}`);
+                });
+            });
+            
+            // Copiar código do cupom
+            document.querySelectorAll('.copy-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const couponCode = this.parentElement.querySelector('.coupon-code').textContent;
+                    navigator.clipboard.writeText(couponCode).then(() => {
+                        const originalText = this.textContent;
+                        this.textContent = 'Copiado!';
+                        setTimeout(() => {
+                            this.textContent = originalText;
+                        }, 2000);
+                    });
+                });
+            });
         });
-      });
-    });
-
-    // Se o PWA já estiver instalado, não precisa mais do botão
-    window.addEventListener('appinstalled', (evt) => {
-      console.log('PWA instalado!');
-    });
-  </script>
+    </script>
 </body>
 </html>
